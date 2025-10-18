@@ -739,7 +739,7 @@ pub(crate) fn splat(
                             Ok(())
                         };
 
-                        if config.enable_symlinks {
+                        if config.enable_symlinks || config.vfsoverlay {
                             add_symlinks()?;
                         }
 
