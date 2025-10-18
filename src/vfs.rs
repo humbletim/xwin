@@ -18,6 +18,7 @@ pub enum VfsEntry {
         #[serde(with = "pathbuf_serializer")]
         name: PathBuf,
         #[serde(with = "pathbuf_serializer")]
+        #[serde(rename = "external-contents")]
         external_contents: PathBuf,
     },
     #[serde(rename = "directory-remap")]
@@ -25,6 +26,7 @@ pub enum VfsEntry {
         #[serde(with = "pathbuf_serializer")]
         name: PathBuf,
         #[serde(with = "pathbuf_serializer")]
+        #[serde(rename = "external-contents")]
         external_contents: PathBuf,
     },
 }
