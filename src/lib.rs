@@ -878,14 +878,19 @@ use parking_lot::Mutex;
 fn symlink(
     original: &str,
     link: &Path,
-    vfs: Option<&Mutex<vfs::VfsOverlay>>,
+    vfs: Option<(&Mutex<vfs::VfsOverlay>, &Path)>,
 ) -> Result<(), Error> {
-    if let Some(vfs) = vfs {
+    if let Some((vfs, output_root)) = vfs {
         let external_contents_path = link.parent().unwrap().join(original);
-        let external_contents = util::canonicalize(&external_contents_path)?;
-        let name = util::canonicalize(link.parent().unwrap())?.join(link.file_name().unwrap());
+        let external_contents_abs = util::canonicalize(&external_contents_path)?;
+        let name_abs = util::canonicalize(link.parent().unwrap())?.join(link.file_name().unwrap());
 
-        let entry = if external_contents.is_dir() {
+        let name = name_abs.strip_prefix(output_root)?.to_path_buf();
+        let external_contents = external_contents_abs
+            .strip_prefix(output_root)?
+            .to_path_buf();
+
+        let entry = if external_contents_abs.is_dir() {
             vfs::VfsEntry::DirectoryRemap {
                 name,
                 external_contents,
@@ -923,12 +928,18 @@ fn symlink(
 fn symlink_on_windows_too(
     original: &str,
     link: &Path,
-    vfs: Option<&Mutex<vfs::VfsOverlay>>,
+    vfs: Option<(&Mutex<vfs::VfsOverlay>, &Path)>,
 ) -> Result<(), Error> {
-    if let Some(vfs) = vfs {
+    if let Some((vfs, output_root)) = vfs {
         let external_contents_path = link.parent().unwrap().join(original);
-        let external_contents = util::canonicalize(&external_contents_path)?;
-        let name = util::canonicalize(link.parent().unwrap())?.join(link.file_name().unwrap());
+        let external_contents_abs = util::canonicalize(&external_contents_path)?;
+        let name_abs = util::canonicalize(link.parent().unwrap())?.join(link.file_name().unwrap());
+
+        let name = name_abs.strip_prefix(output_root)?.to_path_buf();
+        let external_contents = external_contents_abs
+            .strip_prefix(output_root)?
+            .to_path_buf();
+
         vfs.lock().roots.push(vfs::VfsEntry::DirectoryRemap {
             name,
             external_contents,

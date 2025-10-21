@@ -7,6 +7,8 @@ pub struct VfsOverlay {
     pub version: u32,
     #[serde(with = "string_bool")]
     pub case_sensitive: bool,
+    #[serde(with = "string_bool")]
+    pub overlay_relative: bool,
     pub roots: Vec<VfsEntry>,
 }
 
@@ -39,7 +41,7 @@ mod pathbuf_serializer {
     where
         S: Serializer,
     {
-        serializer.serialize_str(value.as_str())
+        serializer.serialize_str(&value.as_str().replace('\\', "/"))
     }
 }
 
@@ -47,7 +49,8 @@ impl VfsOverlay {
     pub fn new() -> Self {
         Self {
             version: 0,
-            case_sensitive: false,
+            case_sensitive: true,
+            overlay_relative: true,
             roots: Vec::new(),
         }
     }
