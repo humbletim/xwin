@@ -122,7 +122,7 @@ pub(crate) fn splat(
     item: &crate::WorkItem,
     tree: &crate::unpack::FileTree,
     map: Option<&crate::Map>,
-    vfs: Option<&Mutex<vfs::VfsOverlay>>,
+    vfs: Option<(&Mutex<vfs::VfsOverlay>, &Path)>,
     sdk_version: &str,
     vcrd_version: Option<String>,
     arches: u32,
@@ -837,7 +837,7 @@ pub(crate) fn finalize_splat(
     sdk_headers: Vec<SdkHeaders>,
     crt_headers: Option<crate::unpack::FileTree>,
     atl_headers: Option<crate::unpack::FileTree>,
-    vfs: Option<&Mutex<vfs::VfsOverlay>>,
+    vfs: Option<(&Mutex<vfs::VfsOverlay>, &Path)>,
 ) -> Result<(), Error> {
     let mut files: std::collections::HashMap<
         _,

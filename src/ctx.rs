@@ -381,7 +381,9 @@ impl Ctx {
                 }
 
                 let sdk_headers = if let Some((splat_roots, config)) = &splat_config {
-                    let vfs = config.vfsoverlay.then_some(&vfs);
+                    let vfs = config
+                        .vfsoverlay
+                        .then_some((&vfs, splat_roots.root.as_path()));
 
                     crate::splat::splat(
                         config,
@@ -419,9 +421,9 @@ impl Ctx {
         };
 
         let splat_links = || -> anyhow::Result<()> {
-            let vfs = sc.vfsoverlay.then_some(&vfs);
+            let vfs_with_root = sc.vfsoverlay.then_some((&vfs, roots.root.as_path()));
 
-            if enable_symlinks || vfs.is_some() {
+            if enable_symlinks || vfs_with_root.is_some() {
                 let crt_ft = crt_ft.lock().take();
                 let atl_ft = atl_ft.lock().take();
 
@@ -432,11 +434,11 @@ impl Ctx {
                     sdk_headers,
                     crt_ft,
                     atl_ft,
-                    vfs,
+                    vfs_with_root,
                 )?;
             }
 
-            if let Some(vfs) = vfs {
+            if let Some((vfs, _)) = vfs_with_root {
                 let vfs_path = sc.output.join("vfsoverlay.json");
                 let vfs_file = std::fs::File::create(&vfs_path)
                     .with_context(|| format!("failed to create VFS overlay file at {vfs_path}"))?;
