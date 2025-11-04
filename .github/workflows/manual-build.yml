@@ -1,3 +1,7 @@
+name: Manual Trigger Placeholder
 on: workflow_dispatch
 jobs:
-  placeholder:
+  dummy:
+    runs-on: ubuntu-slim # Minimal runner for low footprint
+    steps:
+      - run: echo "Workflow trigger active." # Minimal step
